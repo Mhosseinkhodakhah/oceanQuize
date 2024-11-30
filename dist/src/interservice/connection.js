@@ -27,8 +27,8 @@ class interConnection {
     }
     resetCache() {
         return __awaiter(this, void 0, void 0, function* () {
-            const rawResponse = yield fetch(`http://localhost:5004/interservice/reset-cache`, {
-                method: 'PATCH',
+            const rawResponse = yield fetch(`http://localhost:5004/app/interservice/reset-cache`, {
+                method: 'PUT',
                 headers: {
                     Accept: "*/*",
                     "Content-Type": "application/json",
