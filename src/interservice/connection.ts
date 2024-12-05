@@ -1,7 +1,6 @@
 
 
 
-
 export default class interConnection {
     async putReward(userId: string, point: number | undefined, reason: string) {
         let data = { reason: { reason: reason, point: 100 }, userId: userId }

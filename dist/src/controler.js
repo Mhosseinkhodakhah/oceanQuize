@@ -136,34 +136,47 @@ class contentController {
     //! needs to review
     answer(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
-            const answers = req.body;
-            let trueAnswers = 0;
-            const question = yield questions_1.default.findOne({ questionForm: answers[0].questionForm });
-            for (let i = 0; i < answers.length; i++) {
-                let title = answers[i].questionForm;
-                if ((question === null || question === void 0 ? void 0 : question.options[question === null || question === void 0 ? void 0 : question.trueOption]) == answers[i].answer) {
-                    trueAnswers++;
-                    yield questions_1.default.findOneAndUpdate({ questionForm: title }, { $push: { passedUser: req.user.id } });
+            const answers = req.body; // get the body
+            console.log('body . . .', answers);
+            let trueAnswers = 0; // define the true answer variable;
+            const firstlyQuestion = yield questions_1.default.findOne({ questionForm: answers[0].questionForm }); // find the first question by question form
+            for (let i = 0; i < answers.length; i++) { // loop on the all answers
+                console.log(`${i} answer . . .`);
+                let title = answers[i].questionForm; // get title from the answer
+                const question = yield questions_1.default.findOne({ questionForm: title }); // find the first question by question form
+                if ((question === null || question === void 0 ? void 0 : question.options[question === null || question === void 0 ? void 0 : question.trueOption]) == answers[i].answer) { //  it means the user select the true answer  
+                    console.log(`${i} answer true . . .`);
+                    trueAnswers++; // increase the trueAnswer ++
+                    yield (question === null || question === void 0 ? void 0 : question.updateOne({ questionForm: title }, { $addToSet: { passedUser: req.user.id } })); // update the specific question 
+                    yield (question === null || question === void 0 ? void 0 : question.save());
                 }
             }
-            if (trueAnswers == 10) {
-                const level = yield level_1.default.findByIdAndUpdate(question === null || question === void 0 ? void 0 : question.level, { $push: { passedUsers: req.user.id } });
-                const rewarded = yield connection.putReward(req.user.id, level === null || level === void 0 ? void 0 : level.reward, `passed ${level === null || level === void 0 ? void 0 : level.number} level`);
+            if (trueAnswers == 10) { // if the user answer all questions truely
+                console.log(`all answers was true . . .`);
+                const level = yield level_1.default.findById(firstlyQuestion === null || firstlyQuestion === void 0 ? void 0 : firstlyQuestion.level); // update the level and put user to that level
+                level === null || level === void 0 ? void 0 : level.updateOne({ $addToSet: { passedUsers: req.user.id } });
+                console.log('put user to levels passed users');
+                const rewarded = yield connection.putReward(req.user.id, level === null || level === void 0 ? void 0 : level.reward, `passed ${level === null || level === void 0 ? void 0 : level.number} level`); // put reward for user
                 if (rewarded.success) {
-                    yield level_1.default.findByIdAndUpdate(level === null || level === void 0 ? void 0 : level._id, { rewarded: true });
+                    console.log('rewarding user successfully done . . .');
+                    yield (level === null || level === void 0 ? void 0 : level.updateOne({ $addToSet: { rewarded: req.user.id } })); // then update level for rewarded
+                    console.log('update level ');
                 }
-                const lessonLevels = yield lesson_1.default.findById(level === null || level === void 0 ? void 0 : level.lesson).populate('levels').select('levels');
-                for (let j = 0; j < (lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels.length); j++) {
-                    if (lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels[j].passedUser.includes(req.user.id)) {
-                        yield lesson_1.default.findByIdAndUpdate(level === null || level === void 0 ? void 0 : level.lesson, { $push: { paasedQuize: req.user.id } });
-                        yield connection.resetCache();
-                        return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this quize' }));
+                yield (level === null || level === void 0 ? void 0 : level.save());
+                const lessonLevels = yield lesson_1.default.findById(level === null || level === void 0 ? void 0 : level.lesson).populate('levels').select('levels'); // get all levels on lesson for checking the user finishing all levells
+                if (lessonLevels) {
+                    for (let j = 0; j < (lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels.length); j++) { // loop on the all lesson levels
+                        if (lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels[j].passedUser.includes(req.user.id)) { // if user passed all levels of that lesson
+                            yield lesson_1.default.findByIdAndUpdate(level === null || level === void 0 ? void 0 : level.lesson, { $push: { paasedQuize: req.user.id } }); // update that lesson and put user to passed quize
+                            yield connection.resetCache(); // reset the fucking cache
+                            return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }));
+                        }
                     }
                 }
             }
-            else {
+            else { // if the user didnt pass all 10 question
                 yield connection.resetCache();
-                return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: 'sorry! you cant pass this level! please review the lesson and try again' }));
+                return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: `sorry! you cant pass this level! ${10 - trueAnswers} question with wrong answers please review the lesson and try again` }));
             }
         });
     }

@@ -1,14 +1,14 @@
 export interface lessonDB {
-    name: string,
-    number: number,
-    sublessons: {}[],
-    reward: number,
-    eName: string,
-    aName: string,
+    name : string,
+    eName : string,
+    aName : string,
+    number : number,
+    sublessons : any[],
+    reward : number,
     seen: string[],
-    rewarded: boolean,
-    paasedQuize: boolean,
-    levels: any
+    rewarded : string[],
+    levels : any,
+    paasedQuize : string[],
 }
 
 
@@ -28,7 +28,7 @@ export interface questionDB {
 
 export interface levelDB {
     number: number,
-    rewarded: boolean,
+    rewarded: any[],
     reward: number,
     lesson: any,
     passedUsers: string[],

@@ -146,36 +146,48 @@ export default class contentController {
 
     //! needs to review
     async answer(req: any, res: any, next: any) {
-        const answers = req.body
-        let trueAnswers: number = 0;
-        const question = await questionModel.findOne({ questionForm: answers[0].questionForm })
-        for (let i = 0; i < answers.length; i++) {
-            let title = answers[i].questionForm;
-            if (question?.options[question?.trueOption] == answers[i].answer) {
-                trueAnswers++;
-                await questionModel.findOneAndUpdate({ questionForm: title }, { $push: { passedUser: req.user.id } })
+        const answers = req.body                              // get the body
+        console.log('body . . .' , answers)
+        let trueAnswers: number = 0;                            // define the true answer variable;
+        const firstlyQuestion = await questionModel.findOne({ questionForm:answers[0].questionForm  })   // find the first question by question form
+        for (let i = 0; i < answers.length; i++) {                                              // loop on the all answers
+            console.log(`${i} answer . . .`)
+            let title = answers[i].questionForm;                                            // get title from the answer
+            const question = await questionModel.findOne({ questionForm: title })   // find the first question by question form
+            if (question?.options[question?.trueOption] == answers[i].answer) {                //  it means the user select the true answer  
+                console.log(`${i} answer true . . .`)
+                trueAnswers++;                                                      // increase the trueAnswer ++
+                await question?.updateOne({ questionForm: title }, { $addToSet : { passedUser: req.user.id } })    // update the specific question 
+                await question?.save()
             }
         }
-        if (trueAnswers == 10) {
-            const level = await levelModel.findByIdAndUpdate(question?.level, { $push: { passedUsers: req.user.id } })
-            const rewarded = await connection.putReward(req.user.id, level?.reward, `passed ${level?.number} level`)
+        if (trueAnswers == 10) {            // if the user answer all questions truely
+            console.log(`all answers was true . . .`)
+            const level = await levelModel.findById(firstlyQuestion?.level)     // update the level and put user to that level
+            level?.updateOne({ $addToSet: { passedUsers: req.user.id } })
+            console.log('put user to levels passed users')
+            const rewarded = await connection.putReward(req.user.id, level?.reward, `passed ${level?.number} level`)           // put reward for user
             if (rewarded.success) {
-                await levelModel.findByIdAndUpdate(level?._id, { rewarded: true })
+                console.log('rewarding user successfully done . . .')  
+                await level?.updateOne({$addToSet : { rewarded: req.user.id }})              // then update level for rewarded
+                console.log('update level ')
             }
-            const lessonLevels = await lessonModel.findById(level?.lesson).populate('levels').select('levels')
-            for (let j = 0; j < lessonLevels?.levels.length; j++) {
-                if (lessonLevels?.levels[j].passedUser.includes(req.user.id)) {
-                    await lessonModel.findByIdAndUpdate(level?.lesson, { $push: { paasedQuize: req.user.id } })
-                    await connection.resetCache()
-                    return next(new response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this quize' }))
+            await level?.save()
+            const lessonLevels = await lessonModel.findById(level?.lesson).populate('levels').select('levels')           // get all levels on lesson for checking the user finishing all levells
+            if (lessonLevels){
+                for (let j = 0; j < lessonLevels?.levels.length; j++) {                     // loop on the all lesson levels
+                    if (lessonLevels?.levels[j].passedUser.includes(req.user.id)) {                  // if user passed all levels of that lesson
+                        await lessonModel.findByIdAndUpdate(level?.lesson, { $push: { paasedQuize: req.user.id } })    // update that lesson and put user to passed quize
+                        await connection.resetCache()          // reset the fucking cache
+                        return next(new response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }))
+                    }
                 }
             }
-        } else {
-            await connection.resetCache()
-            return next(new response(req, res, 'answer questions', 200, null, { message: 'sorry! you cant pass this level! please review the lesson and try again' }))
+        } else {                                                                // if the user didnt pass all 10 question
+            await connection.resetCache()              
+            return next(new response(req, res, 'answer questions', 200, null, { message: `sorry! you cant pass this level! ${10-trueAnswers} question with wrong answers please review the lesson and try again` }))
         }
     }
-
 
 
     async getAllContent(req: any, res: any, next: any){
