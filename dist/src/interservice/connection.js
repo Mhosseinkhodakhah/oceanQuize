@@ -34,6 +34,14 @@ class interConnection {
                     "Content-Type": "application/json",
                 },
             });
+            const rawResponse2 = yield fetch(`http://localhost:5003/app/interservice/reset-cache`, {
+                method: 'PUT',
+                headers: {
+                    Accept: "*/*",
+                    "Content-Type": "application/json",
+                },
+            });
+            const response2 = yield rawResponse2.json();
             const response = yield rawResponse.json();
             return response;
         });
