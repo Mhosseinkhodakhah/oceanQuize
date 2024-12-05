@@ -177,10 +177,10 @@ class contentController {
                     if (isAllLevels == lessonLevels.levels.length) {
                         yield lesson_1.default.findByIdAndUpdate(level === null || level === void 0 ? void 0 : level.lesson, { $push: { paasedQuize: req.user.id } }); // update that lesson and put user to passed quize
                         yield connection.resetCache(); // reset the fucking cache
-                        return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }));
+                        return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: `congratulation! you passed this level and now you can start the ${lessonLevels.number + 1}` }));
                     }
                     else {
-                        return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }));
+                        return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: `congratulation! you passed this level and you can start the next level` }));
                     }
                 }
             }
