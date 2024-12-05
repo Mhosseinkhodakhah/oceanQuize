@@ -169,7 +169,7 @@ export default class contentController {
             const rewarded = await connection.putReward(req.user.id, level?.reward, `passed ${level?.number} level`)           // put reward for user
             if (rewarded.success) {
                 console.log('rewarding user successfully done . . .')  
-                await level?.updateOne({$addToSet : { rewarded: req.user.id }})              // then update level for rewarded
+                // await level?.updateOne({$addToSet : { rewarded : req.user.id }})              // then update level for rewarded
                 console.log('update level ')
             }
             await level?.save()
