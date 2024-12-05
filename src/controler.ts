@@ -177,8 +177,7 @@ export default class contentController {
             if (lessonLevels){
                 console.log(lessonLevels.levels)
                 for (let j = 0; j < lessonLevels?.levels.length; j++) {                     // loop on the all lesson levels
-                    console.log(lessonLevels?.levels[j].passedUser)
-                    if (lessonLevels?.levels[j]?.passedUser?.includes(req.user.id)) {                  // if user passed all levels of that lesson
+                    if (lessonLevels?.levels[j]?.passedUsers?.includes(req.user.id)) {                  // if user passed all levels of that lesson
                         await lessonModel.findByIdAndUpdate(level?.lesson, { $push: { paasedQuize: req.user.id } })    // update that lesson and put user to passed quize
                         await connection.resetCache()          // reset the fucking cache
                         return next(new response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }))
