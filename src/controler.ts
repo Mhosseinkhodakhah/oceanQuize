@@ -154,7 +154,7 @@ export default class contentController {
             console.log(`${i} answer . . .`)
             let qId = answers[i].id;                                            // get title from the answer
             const question = await questionModel.findById( qId )   // find the first question by question form
-            if (question?.options[question?.trueOption] == answers[i].answer) {                //  it means the user select the true answer  
+            if (question?.trueOption == answers[i].answer) {                //  it means the user select the true answer  
                 console.log(`${i} answer true . . .`)
                 trueAnswers++;                                                      // increase the trueAnswer ++
                 await question?.updateOne({ $addToSet : { passedUser: req.user.id } })    // update the specific question 

@@ -144,7 +144,7 @@ class contentController {
                 console.log(`${i} answer . . .`);
                 let qId = answers[i].id; // get title from the answer
                 const question = yield questions_1.default.findById(qId); // find the first question by question form
-                if ((question === null || question === void 0 ? void 0 : question.options[question === null || question === void 0 ? void 0 : question.trueOption]) == answers[i].answer) { //  it means the user select the true answer  
+                if ((question === null || question === void 0 ? void 0 : question.trueOption) == answers[i].answer) { //  it means the user select the true answer  
                     console.log(`${i} answer true . . .`);
                     trueAnswers++; // increase the trueAnswer ++
                     yield (question === null || question === void 0 ? void 0 : question.updateOne({ $addToSet: { passedUser: req.user.id } })); // update the specific question 
