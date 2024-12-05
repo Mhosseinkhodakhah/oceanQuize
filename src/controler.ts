@@ -164,7 +164,7 @@ export default class contentController {
         if (trueAnswers == answers.length) {            // if the user answer all questions truely
             console.log(`all answers was true . . .`)
             const level = await levelModel.findById(firstlyQuestion?.level)     // update the level and put user to that level
-            level?.updateOne({ $addToSet: { passedUsers: req.user.id } })
+            await level?.updateOne({ $addToSet: { passedUsers: req.user.id } })
             console.log('put user to levels passed users')
             const rewarded = await connection.putReward(req.user.id, level?.reward, `passed ${level?.number} level`)           // put reward for user
             if (rewarded.success) {

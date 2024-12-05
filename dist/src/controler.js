@@ -155,7 +155,7 @@ class contentController {
             if (trueAnswers == answers.length) { // if the user answer all questions truely
                 console.log(`all answers was true . . .`);
                 const level = yield level_1.default.findById(firstlyQuestion === null || firstlyQuestion === void 0 ? void 0 : firstlyQuestion.level); // update the level and put user to that level
-                level === null || level === void 0 ? void 0 : level.updateOne({ $addToSet: { passedUsers: req.user.id } });
+                yield (level === null || level === void 0 ? void 0 : level.updateOne({ $addToSet: { passedUsers: req.user.id } }));
                 console.log('put user to levels passed users');
                 const rewarded = yield connection.putReward(req.user.id, level === null || level === void 0 ? void 0 : level.reward, `passed ${level === null || level === void 0 ? void 0 : level.number} level`); // put reward for user
                 if (rewarded.success) {
