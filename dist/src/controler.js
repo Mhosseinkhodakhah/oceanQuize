@@ -137,7 +137,7 @@ class contentController {
     answer(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
-            const answers = req.body; // get the body
+            const answers = req.body.answer; // get the body
             console.log('body . . .', answers);
             let trueAnswers = 0; // define the true answer variable;
             const firstlyQuestion = yield questions_1.default.findById(answers[0].id); // find the first question by question form

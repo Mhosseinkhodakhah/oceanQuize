@@ -146,7 +146,7 @@ export default class contentController {
 
     //! needs to review
     async answer(req: any, res: any, next: any) {
-        const answers = req.body                              // get the body
+        const answers = req.body.answer                              // get the body
         console.log('body . . .', answers)
         let trueAnswers: number = 0;                            // define the true answer variable;
         const firstlyQuestion = await questionModel.findById(answers[0].id)   // find the first question by question form
