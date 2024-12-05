@@ -149,15 +149,15 @@ export default class contentController {
         const answers = req.body                              // get the body
         console.log('body . . .' , answers)
         let trueAnswers: number = 0;                            // define the true answer variable;
-        const firstlyQuestion = await questionModel.findOne({ questionForm:answers[0].questionForm  })   // find the first question by question form
+        const firstlyQuestion = await questionModel.findById(answers[0].id)   // find the first question by question form
         for (let i = 0; i < answers.length; i++) {                                              // loop on the all answers
             console.log(`${i} answer . . .`)
-            let title = answers[i].questionForm;                                            // get title from the answer
-            const question = await questionModel.findOne({ questionForm: title })   // find the first question by question form
+            let qId = answers[i].id;                                            // get title from the answer
+            const question = await questionModel.findById( qId )   // find the first question by question form
             if (question?.options[question?.trueOption] == answers[i].answer) {                //  it means the user select the true answer  
                 console.log(`${i} answer true . . .`)
                 trueAnswers++;                                                      // increase the trueAnswer ++
-                await question?.updateOne({ questionForm: title }, { $addToSet : { passedUser: req.user.id } })    // update the specific question 
+                await question?.updateOne({ $addToSet : { passedUser: req.user.id } })    // update the specific question 
                 await question?.save()
             }
         }
