@@ -166,13 +166,16 @@ class contentController {
                 yield (level === null || level === void 0 ? void 0 : level.save());
                 const lessonLevels = yield lesson_1.default.findById(level === null || level === void 0 ? void 0 : level.lesson).populate('levels').select('levels'); // get all levels on lesson for checking the user finishing all levells
                 if (lessonLevels) {
-                    console.log(lessonLevels.levels);
+                    let isAllLevels = 0;
                     for (let j = 0; j < (lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels.length); j++) { // loop on the all lesson levels
                         if ((_b = (_a = lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels[j]) === null || _a === void 0 ? void 0 : _a.passedUsers) === null || _b === void 0 ? void 0 : _b.includes(req.user.id)) { // if user passed all levels of that lesson
-                            yield lesson_1.default.findByIdAndUpdate(level === null || level === void 0 ? void 0 : level.lesson, { $push: { paasedQuize: req.user.id } }); // update that lesson and put user to passed quize
-                            yield connection.resetCache(); // reset the fucking cache
-                            return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }));
+                            isAllLevels++;
                         }
+                    }
+                    if (isAllLevels == lessonLevels.levels.length) {
+                        yield lesson_1.default.findByIdAndUpdate(level === null || level === void 0 ? void 0 : level.lesson, { $push: { paasedQuize: req.user.id } }); // update that lesson and put user to passed quize
+                        yield connection.resetCache(); // reset the fucking cache
+                        return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }));
                     }
                 }
             }

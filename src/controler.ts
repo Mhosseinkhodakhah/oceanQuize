@@ -72,8 +72,8 @@ export default class contentController {
     async getSubLesson(req: any, res: any, next: any) {
         const language = req.params.lang;
         let sublessonContent;
-        sublessonContent = await contentModel.findById( req.params.contentId)
-        if (!sublessonContent){
+        sublessonContent = await contentModel.findById(req.params.contentId)
+        if (!sublessonContent) {
             return next(new response(req, res, 'get specific subLesson', 400, 'this content is not exist', null))
         }
 
@@ -109,18 +109,18 @@ export default class contentController {
                 console.log('cache is not exist . . .')
                 const data = await services.readyLevelsData(userId)     // make the levels ready for this user
                 userLevels[userId] = data                                      // add new userLevels to cache data
-                await cacher.setter('getLevels' , userLevels)                    // cache heat the new data
-                levels = data                                                   
+                await cacher.setter('getLevels', userLevels)                    // cache heat the new data
+                levels = data
             } else {                                // this userLevels are exist on cache
                 console.log('cache is ready . . .')
-                levels = userLevels[userId]                 
+                levels = userLevels[userId]
             }
         } else {                                    // if cache was totaly empty
             console.log('cache is empty . .. .')
             const data = await services.readyLevelsData(userId)         // make this userlevels dat a for cache
             userLevels = {}                                         // make structure of cache data
             userLevels[userId] = data                           // add this userLevels to cachData
-            await cacher.setter('getLevels' , userLevels)
+            await cacher.setter('getLevels', userLevels)
             levels = data
         }
 
@@ -147,17 +147,17 @@ export default class contentController {
     //! needs to review
     async answer(req: any, res: any, next: any) {
         const answers = req.body                              // get the body
-        console.log('body . . .' , answers)
+        console.log('body . . .', answers)
         let trueAnswers: number = 0;                            // define the true answer variable;
         const firstlyQuestion = await questionModel.findById(answers[0].id)   // find the first question by question form
         for (let i = 0; i < answers.length; i++) {                                              // loop on the all answers
             console.log(`${i} answer . . .`)
             let qId = answers[i].id;                                            // get title from the answer
-            const question = await questionModel.findById( qId )   // find the first question by question form
+            const question = await questionModel.findById(qId)   // find the first question by question form
             if (question?.trueOption == answers[i].answer) {                //  it means the user select the true answer  
                 console.log(`${i} answer true . . .`)
                 trueAnswers++;                                                      // increase the trueAnswer ++
-                await question?.updateOne({ $addToSet : { passedUser: req.user.id } })    // update the specific question 
+                await question?.updateOne({ $addToSet: { passedUser: req.user.id } })    // update the specific question 
                 await question?.save()
             }
         }
@@ -168,32 +168,35 @@ export default class contentController {
             console.log('put user to levels passed users')
             const rewarded = await connection.putReward(req.user.id, level?.reward, `passed ${level?.number} level`)           // put reward for user
             if (rewarded.success) {
-                console.log('rewarding user successfully done . . .')  
+                console.log('rewarding user successfully done . . .')
                 // await level?.updateOne({$addToSet : { rewarded : req.user.id }})              // then update level for rewarded
                 console.log('update level ')
             }
             await level?.save()
             const lessonLevels = await lessonModel.findById(level?.lesson).populate('levels').select('levels')           // get all levels on lesson for checking the user finishing all levells
-            if (lessonLevels){
-                console.log(lessonLevels.levels)
+            if (lessonLevels) {
+                let isAllLevels: number = 0;
                 for (let j = 0; j < lessonLevels?.levels.length; j++) {                     // loop on the all lesson levels
                     if (lessonLevels?.levels[j]?.passedUsers?.includes(req.user.id)) {                  // if user passed all levels of that lesson
-                        await lessonModel.findByIdAndUpdate(level?.lesson, { $push: { paasedQuize: req.user.id } })    // update that lesson and put user to passed quize
-                        await connection.resetCache()          // reset the fucking cache
-                        return next(new response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }))
+                        isAllLevels++;
                     }
+                }
+                if (isAllLevels == lessonLevels.levels.length) {
+                    await lessonModel.findByIdAndUpdate(level?.lesson, { $push: { paasedQuize: req.user.id } })    // update that lesson and put user to passed quize
+                    await connection.resetCache()          // reset the fucking cache
+                    return next(new response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }))
                 }
             }
         } else {                                                                // if the user didnt pass all 10 question
-            await connection.resetCache()              
-            return next(new response(req, res, 'answer questions', 200, null, { message: `sorry! you cant pass this level! ${10-trueAnswers} question with wrong answers please review the lesson and try again` }))
+            await connection.resetCache()
+            return next(new response(req, res, 'answer questions', 200, null, { message: `sorry! you cant pass this level! ${10 - trueAnswers} question with wrong answers please review the lesson and try again` }))
         }
     }
 
 
-    async getAllContent(req: any, res: any, next: any){
+    async getAllContent(req: any, res: any, next: any) {
         const contents = await contentModel.find()
-        return next (new response(req , res , 'get contents' , 200 , null , contents))
+        return next(new response(req, res, 'get contents', 200, null, contents))
     }
 
 
