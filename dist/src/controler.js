@@ -151,7 +151,7 @@ class contentController {
                     yield (question === null || question === void 0 ? void 0 : question.save());
                 }
             }
-            if (trueAnswers == 10) { // if the user answer all questions truely
+            if (trueAnswers == answers.length) { // if the user answer all questions truely
                 console.log(`all answers was true . . .`);
                 const level = yield level_1.default.findById(firstlyQuestion === null || firstlyQuestion === void 0 ? void 0 : firstlyQuestion.level); // update the level and put user to that level
                 level === null || level === void 0 ? void 0 : level.updateOne({ $addToSet: { passedUsers: req.user.id } });
