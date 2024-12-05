@@ -178,18 +178,22 @@ export default class contentController {
                 let isAllLevels: number = 0;
                 for (let j = 0; j < lessonLevels?.levels.length; j++) {                     // loop on the all lesson levels
                     if (lessonLevels?.levels[j]?.passedUsers?.includes(req.user.id)) {                  // if user passed all levels of that lesson
+                        console.log('user is in the levele passed user')
                         isAllLevels++;
                     }
                 }
+                console.log('user is in the levele passed user')
                 if (isAllLevels == lessonLevels.levels.length) {
                     await lessonModel.findByIdAndUpdate(level?.lesson, { $push: { paasedQuize: req.user.id } })    // update that lesson and put user to passed quize
                     await connection.resetCache()          // reset the fucking cache
+                    return next(new response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }))
+                } else {
                     return next(new response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }))
                 }
             }
         } else {                                                                // if the user didnt pass all 10 question
             await connection.resetCache()
-            return next(new response(req, res, 'answer questions', 200, null, { message: `sorry! you cant pass this level! ${10 - trueAnswers} question with wrong answers please review the lesson and try again` }))
+            return next(new response(req, res, 'answer questions', 200, null, { message: `sorry! you cant pass this level! ${answers.length - trueAnswers} question with wrong answers please review the lesson and try again` }))
         }
     }
 

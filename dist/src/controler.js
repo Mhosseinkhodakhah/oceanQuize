@@ -169,19 +169,24 @@ class contentController {
                     let isAllLevels = 0;
                     for (let j = 0; j < (lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels.length); j++) { // loop on the all lesson levels
                         if ((_b = (_a = lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels[j]) === null || _a === void 0 ? void 0 : _a.passedUsers) === null || _b === void 0 ? void 0 : _b.includes(req.user.id)) { // if user passed all levels of that lesson
+                            console.log('user is in the levele passed user');
                             isAllLevels++;
                         }
                     }
+                    console.log('user is in the levele passed user');
                     if (isAllLevels == lessonLevels.levels.length) {
                         yield lesson_1.default.findByIdAndUpdate(level === null || level === void 0 ? void 0 : level.lesson, { $push: { paasedQuize: req.user.id } }); // update that lesson and put user to passed quize
                         yield connection.resetCache(); // reset the fucking cache
+                        return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }));
+                    }
+                    else {
                         return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }));
                     }
                 }
             }
             else { // if the user didnt pass all 10 question
                 yield connection.resetCache();
-                return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: `sorry! you cant pass this level! ${10 - trueAnswers} question with wrong answers please review the lesson and try again` }));
+                return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: `sorry! you cant pass this level! ${answers.length - trueAnswers} question with wrong answers please review the lesson and try again` }));
             }
         });
     }
