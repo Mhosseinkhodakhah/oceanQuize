@@ -160,7 +160,7 @@ class contentController {
                 const rewarded = yield connection.putReward(req.user.id, level === null || level === void 0 ? void 0 : level.reward, `passed ${level === null || level === void 0 ? void 0 : level.number} level`); // put reward for user
                 if (rewarded.success) {
                     console.log('rewarding user successfully done . . .');
-                    // await level?.updateOne({$addToSet : { rewarded : req.user.id }})              // then update level for rewarded
+                    yield (level === null || level === void 0 ? void 0 : level.updateOne({ $addToSet: { rewarded: req.user.id } })); // then update level for rewarded
                     console.log('update level ');
                 }
                 yield (level === null || level === void 0 ? void 0 : level.save());
@@ -180,6 +180,7 @@ class contentController {
                         return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: `congratulation! you passed this level and now you can start the ${lessonLevels.number + 1}` }));
                     }
                     else {
+                        yield connection.resetCache();
                         return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: `congratulation! you passed this level and you can start the next level` }));
                     }
                 }
