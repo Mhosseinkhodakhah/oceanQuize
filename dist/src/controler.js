@@ -136,6 +136,7 @@ class contentController {
     //! needs to review
     answer(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b;
             const answers = req.body; // get the body
             console.log('body . . .', answers);
             let trueAnswers = 0; // define the true answer variable;
@@ -166,7 +167,8 @@ class contentController {
                 const lessonLevels = yield lesson_1.default.findById(level === null || level === void 0 ? void 0 : level.lesson).populate('levels').select('levels'); // get all levels on lesson for checking the user finishing all levells
                 if (lessonLevels) {
                     for (let j = 0; j < (lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels.length); j++) { // loop on the all lesson levels
-                        if (lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels[j].passedUser.includes(req.user.id)) { // if user passed all levels of that lesson
+                        console.log(lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels[j].passedUser);
+                        if ((_b = (_a = lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels[j]) === null || _a === void 0 ? void 0 : _a.passedUser) === null || _b === void 0 ? void 0 : _b.includes(req.user.id)) { // if user passed all levels of that lesson
                             yield lesson_1.default.findByIdAndUpdate(level === null || level === void 0 ? void 0 : level.lesson, { $push: { paasedQuize: req.user.id } }); // update that lesson and put user to passed quize
                             yield connection.resetCache(); // reset the fucking cache
                             return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: 'congratulation! you passed this level' }));
