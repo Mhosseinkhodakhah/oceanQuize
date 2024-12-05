@@ -175,6 +175,7 @@ export default class contentController {
             await level?.save()
             const lessonLevels = await lessonModel.findById(level?.lesson).populate('levels').select('levels')           // get all levels on lesson for checking the user finishing all levells
             if (lessonLevels){
+                console.log(lessonLevels.levels)
                 for (let j = 0; j < lessonLevels?.levels.length; j++) {                     // loop on the all lesson levels
                     console.log(lessonLevels?.levels[j].passedUser)
                     if (lessonLevels?.levels[j]?.passedUser?.includes(req.user.id)) {                  // if user passed all levels of that lesson

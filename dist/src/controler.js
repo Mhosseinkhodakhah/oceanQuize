@@ -166,6 +166,7 @@ class contentController {
                 yield (level === null || level === void 0 ? void 0 : level.save());
                 const lessonLevels = yield lesson_1.default.findById(level === null || level === void 0 ? void 0 : level.lesson).populate('levels').select('levels'); // get all levels on lesson for checking the user finishing all levells
                 if (lessonLevels) {
+                    console.log(lessonLevels.levels);
                     for (let j = 0; j < (lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels.length); j++) { // loop on the all lesson levels
                         console.log(lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels[j].passedUser);
                         if ((_b = (_a = lessonLevels === null || lessonLevels === void 0 ? void 0 : lessonLevels.levels[j]) === null || _a === void 0 ? void 0 : _a.passedUser) === null || _b === void 0 ? void 0 : _b.includes(req.user.id)) { // if user passed all levels of that lesson
