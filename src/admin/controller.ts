@@ -88,11 +88,7 @@ export default class adminController {
 
     }
 
-
-
-
-
-
+    
     async creteNewLevel(req: any, res: any, next: any) {
         const lesson = await lessonModel.findById(req.params.lessonId)
         if (!lesson) {
