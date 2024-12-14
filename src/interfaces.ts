@@ -1,24 +1,24 @@
 export interface lessonDB {
-    name : string,
-    eName : string,
-    aName : string,
-    number : number,
-    sublessons : any[],
-    reward : number,
+    name: string,
+    number: number,
+    sublessons: {}[],
+    reward: number,
+    eName: string,
+    aName: string,
     seen: string[],
-    rewarded : string[],
-    levels : any,
-    paasedQuize : string[],
+    rewarded: boolean,
+    paasedQuize: boolean,
+    levels: any
 }
 
 
 export interface questionDB {
-    questionForm : string,
-    eQuestionForm : string,
-    aQuestionForm : string,
-    options : string[],
-    eOptions : string[],
-    aOptions : string[],
+    questionForm: string,
+    eQuestionForm: string,
+    aQuestionForm: string,
+    options: string[],
+    eOptions: string[],
+    aOptions: string[],
     trueOption: number,
     time: number,
     level: any,
@@ -28,7 +28,7 @@ export interface questionDB {
 
 export interface levelDB {
     number: number,
-    rewarded: any[],
+    rewarded: boolean,
     reward: number,
     lesson: any,
     passedUsers: string[],
@@ -44,12 +44,20 @@ export interface subLessonDB {
     lesson: any,
     content: {},
     seen: string[]
-    subLessons : {eName : string , number : number , _id : any , content : any}[]
+    subLessons: { eName: string , name : string , aName : string, number: number, _id: any , seen : string[], content: any }[]
 }
 
 
 export interface content {
-    internalContent: {},
+    internalContent: {
+        title: string,
+        aTitle: string,
+        eTitle: string,
+        describtion: string,
+        eDescribtion: string,
+        aDescribtion: string,
+    },
+    state : number
 
     pictures?: string[],
     ePictures?: string[],

@@ -4,6 +4,7 @@ import joi from 'joi'
 import { content } from '../../interfaces'
 
 
+
 const contentSchema = new Schema<content>({
 
     internalContent: {
@@ -21,9 +22,13 @@ const contentSchema = new Schema<content>({
 
     seen: [String],
 
-    subLesson: { type: mongoose.Types.ObjectId, ref: 'subLessons' }
+    state : {type : Number },
+
+    subLesson: { type: mongoose.Types.ObjectId, ref: 'subLessons' },
+
 
 }, { timestamps: true })
+
 
 
 const contentModel = model<content>('contents', contentSchema)
