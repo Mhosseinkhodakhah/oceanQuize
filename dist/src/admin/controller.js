@@ -159,6 +159,7 @@ class adminController {
             if (!question) {
                 return next(new responseService_1.response(req, res, 'update question', 404, 'this question is not exist on databse', null));
             }
+            req.body.trueOption--;
             let finalData = Object.assign(Object.assign({}, question.toObject()), req.body);
             yield question.updateOne(finalData);
             return next(new responseService_1.response(req, res, 'update question', 200, null, finalData));
@@ -175,6 +176,15 @@ class adminController {
                 yield questionLevel.updateOne({ $pull: { questions: question._id } });
             }
             yield question.deleteOne();
+            return next(new responseService_1.response(req, res, 'delete question', 200, null, question));
+        });
+    }
+    getAll(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let question = yield questions_1.default.find();
+            // if (!question) {
+            //     return next(new response(req, res, 'delete question', 404, 'this question is not exist on databse', null))
+            // }
             return next(new responseService_1.response(req, res, 'delete question', 200, null, question));
         });
     }

@@ -160,6 +160,7 @@ export default class adminController {
         if (!question) {
             return next(new response(req, res, 'update question', 404, 'this question is not exist on databse', null))
         }
+        req.body.trueOption--;
         let finalData = { ...question.toObject(), ...req.body }
         await question.updateOne(finalData)
         return next(new response(req, res, 'update question', 200, null, finalData))
@@ -177,9 +178,18 @@ export default class adminController {
         }
         await question.deleteOne()
         return next(new response(req, res, 'delete question', 200, null, question))
-
-
     }
+
+
+    async getAll(req: any, res: any, next: any) {
+        let question = await questionModel.find()
+        // if (!question) {
+        //     return next(new response(req, res, 'delete question', 404, 'this question is not exist on databse', null))
+        // }
+        
+        return next(new response(req, res, 'delete question', 200, null, question))
+    }
+
 
 
     async getLevels(req: any, res: any, next: any) {
