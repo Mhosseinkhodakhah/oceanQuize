@@ -12,4 +12,6 @@ const controller = new controller_1.default();
 adminRouter.post('/create-level/:lessonId', adminAuth, controller.creteNewLevel);
 adminRouter.delete('/delete-level/:levelId', adminAuth, controller.deleteLevel);
 adminRouter.post('/create-questions/:levelId', adminAuth, controller.createQuestion);
+adminRouter.patch('/question/update/:questionId', adminAuth, controller.updateQuestion);
+adminRouter.delete('/question/delete/:questionId', adminAuth, controller.deleteQuestion);
 exports.default = adminRouter;

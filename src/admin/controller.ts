@@ -45,13 +45,13 @@ export default class adminController {
 
 
 
-    async createTitle(req: any, res: any, next: any){
+    async createTitle(req: any, res: any, next: any) {
         const sublesson = await subLessonModel.findById(req.params.sublessonId)
-        if (!sublesson){
-            return next(new response(req , res, 'create title' , 404 , 'this sublesson is not exist on database' , null))
+        if (!sublesson) {
+            return next(new response(req, res, 'create title', 404, 'this sublesson is not exist on database', null))
         }
-        await sublesson.updateOne({$addToSet : {subLessons : req.body}})
-        return next(new response(req , res , 'create title' , 200 , null , 'the title created successfulle'))
+        await sublesson.updateOne({ $addToSet: { subLessons: req.body } })
+        return next(new response(req, res, 'create title', 200, null, 'the title created successfulle'))
     }
 
 
@@ -71,14 +71,14 @@ export default class adminController {
         if (!sublesson) {
             return next(new response(req, res, 'creating content', 404, 'this sublesson is not exist on database', null))
         }
-        const data = { ...req.body , subLesson: req.params.sublesson }
+        const data = { ...req.body, subLesson: req.params.sublesson }
         const content = await contentModel.create(data)
-        
+
 
         sublesson.subLessons.forEach(element => {
-            if (element._id == req.params.sublesson){
+            if (element._id == req.params.sublesson) {
                 element['content'] = content._id
-                console.log('new content . . .' , element)
+                console.log('new content . . .', element)
             }
         });
         await sublesson.save()
@@ -88,7 +88,7 @@ export default class adminController {
 
     }
 
-    
+
     async creteNewLevel(req: any, res: any, next: any) {
         const lesson = await lessonModel.findById(req.params.lessonId)
         if (!lesson) {
@@ -151,6 +151,34 @@ export default class adminController {
         await level.save()
         await connection.resetCache()
         return next(new response(req, res, 'create question', 200, null, 'question created successfully!'))
+    }
+
+
+
+    async updateQuestion(req: any, res: any, next: any) {
+        let question = await questionModel.findById(req.params.questionId)
+        if (!question) {
+            return next(new response(req, res, 'update question', 404, 'this question is not exist on databse', null))
+        }
+        let finalData = { ...question.toObject(), ...req.body }
+        await question.updateOne(finalData)
+        return next(new response(req, res, 'update question', 200, null, finalData))
+    }
+
+
+    async deleteQuestion(req: any, res: any, next: any) {
+        let question = await questionModel.findById(req.params.questionId)
+        if (!question) {
+            return next(new response(req, res, 'delete question', 404, 'this question is not exist on databse', null))
+        }
+        let questionLevel = await levelModel.findById(question?.level)
+        if (questionLevel) {
+            await questionLevel.updateOne({ $pull: { questions: question._id } })
+        }
+        await question.deleteOne()
+        return next(new response(req, res, 'delete question', 200, null, question))
+
+
     }
 
 

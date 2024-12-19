@@ -153,6 +153,31 @@ class adminController {
             return next(new responseService_1.response(req, res, 'create question', 200, null, 'question created successfully!'));
         });
     }
+    updateQuestion(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let question = yield questions_1.default.findById(req.params.questionId);
+            if (!question) {
+                return next(new responseService_1.response(req, res, 'update question', 404, 'this question is not exist on databse', null));
+            }
+            let finalData = Object.assign(Object.assign({}, question.toObject()), req.body);
+            yield question.updateOne(finalData);
+            return next(new responseService_1.response(req, res, 'update question', 200, null, finalData));
+        });
+    }
+    deleteQuestion(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let question = yield questions_1.default.findById(req.params.questionId);
+            if (!question) {
+                return next(new responseService_1.response(req, res, 'delete question', 404, 'this question is not exist on databse', null));
+            }
+            let questionLevel = yield level_1.default.findById(question === null || question === void 0 ? void 0 : question.level);
+            if (questionLevel) {
+                yield questionLevel.updateOne({ $pull: { questions: question._id } });
+            }
+            yield question.deleteOne();
+            return next(new responseService_1.response(req, res, 'delete question', 200, null, question));
+        });
+    }
     getLevels(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             let cacheData = yield cach_1.default.getter('admin-getLevels');
