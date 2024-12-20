@@ -100,21 +100,15 @@ class adminController {
             const level = { number: req.body.number, reward: req.body.reward, lesson: lesson._id };
             const existLevelNumber = yield level_1.default.findOne({ number: req.body.number });
             if (existLevelNumber) {
-                const lesss = yield level_1.default.find({ number: { $gt: req.body.number } });
-                for (let i = 0; i < lesss.length; i++) {
-                    // await lesss[i].updateOne({ $inc: { number: 1 } })
-                    lesss[i].number += 1;
-                    yield lesss[i].save();
-                }
+                yield level_1.default.updateMany({ number: { $gt: req.body.number } }, { $inc: { number: 1 } });
                 yield level_1.default.findOneAndUpdate({ number: req.body.number }, { $inc: { number: 1 } });
                 const levelCreation = yield level_1.default.create(level);
                 yield lesson.updateOne({ $addToSet: { levels: levelCreation._id } });
-                yield lesson.save();
+                yield connection.resetCache();
                 return next(new responseService_1.response(req, res, 'create new level', 200, null, 'new level creation successfully'));
             }
             const levelCreation = yield level_1.default.create(level);
             yield lesson.updateOne({ $addToSet: { levels: levelCreation._id } });
-            yield lesson.save();
             yield connection.resetCache();
             return next(new responseService_1.response(req, res, 'create new level', 200, null, 'new level creation successfully'));
         });

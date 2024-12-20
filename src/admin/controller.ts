@@ -94,24 +94,18 @@ export default class adminController {
         if (!lesson) {
             return next(new response(req, res, 'create new level', 404, 'this lesson is not defined on database', null))
         }
-        const level = { number: req.body.number, reward: req.body.reward, lesson: lesson._id }
+        const level = { number: req.body.number, reward: req.body.reward , lesson: lesson._id }
         const existLevelNumber = await levelModel.findOne({ number: req.body.number })
         if (existLevelNumber) {
-            const lesss = await levelModel.find({ number: { $gt: req.body.number } })
-            for (let i = 0; i < lesss.length; i++) {
-                // await lesss[i].updateOne({ $inc: { number: 1 } })
-                lesss[i].number += 1
-                await lesss[i].save()
-            }
+            await levelModel.updateMany({ number: { $gt: req.body.number } } , {$inc:{ number : 1 }})
             await levelModel.findOneAndUpdate({ number: req.body.number }, { $inc: { number: 1 } })
             const levelCreation = await levelModel.create(level)
             await lesson.updateOne({ $addToSet: { levels: levelCreation._id } })
-            await lesson.save()
+            await connection.resetCache()
             return next(new response(req, res, 'create new level', 200, null, 'new level creation successfully'))
         }
         const levelCreation = await levelModel.create(level)
         await lesson.updateOne({ $addToSet: { levels: levelCreation._id } })
-        await lesson.save()
         await connection.resetCache()
         return next(new response(req, res, 'create new level', 200, null, 'new level creation successfully'))
     }
