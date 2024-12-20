@@ -120,13 +120,9 @@ export default class adminController {
         }
         const lesson = await lessonModel.findOne({ levels: { $in: level._id } })
         const uppersLevels = await levelModel.find({ number: { $gt: level.number } })
-        await lesson?.updateOne({ $pull: { levels: level._id } })
-        await lesson?.save()
+        levelModel.updateMany({ number: { $gt: level.number }} , {})
+        await lesson?.updateOne({ $pull: { levels: level._id } } , {$inc : {number : -1}})
         await level.deleteOne()
-        for (let i = 0; i < uppersLevels.length; i++) {
-            uppersLevels[i].number -= 1
-            await uppersLevels[i].save()
-        }
         await connection.resetCache()
         return next(new response(req, res, 'deleting level', 200, null, 'level deleted successfully'))
     }

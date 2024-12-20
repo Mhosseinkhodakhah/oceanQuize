@@ -121,13 +121,9 @@ class adminController {
             }
             const lesson = yield lesson_1.default.findOne({ levels: { $in: level._id } });
             const uppersLevels = yield level_1.default.find({ number: { $gt: level.number } });
-            yield (lesson === null || lesson === void 0 ? void 0 : lesson.updateOne({ $pull: { levels: level._id } }));
-            yield (lesson === null || lesson === void 0 ? void 0 : lesson.save());
+            level_1.default.updateMany({ number: { $gt: level.number } }, {});
+            yield (lesson === null || lesson === void 0 ? void 0 : lesson.updateOne({ $pull: { levels: level._id } }, { $inc: { number: -1 } }));
             yield level.deleteOne();
-            for (let i = 0; i < uppersLevels.length; i++) {
-                uppersLevels[i].number -= 1;
-                yield uppersLevels[i].save();
-            }
             yield connection.resetCache();
             return next(new responseService_1.response(req, res, 'deleting level', 200, null, 'level deleted successfully'));
         });
