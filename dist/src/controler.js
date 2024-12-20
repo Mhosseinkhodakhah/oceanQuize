@@ -177,17 +177,17 @@ class contentController {
                     if (isAllLevels == lessonLevels.levels.length) {
                         yield lesson_1.default.findByIdAndUpdate(level === null || level === void 0 ? void 0 : level.lesson, { $push: { paasedQuize: req.user.id } }); // update that lesson and put user to passed quize
                         yield connection.resetCache(); // reset the fucking cache
-                        return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: `congratulation! you passed this level and now you can start the ${lessonLevels.number + 1}` }));
+                        return next(new responseService_1.response(req, res, 'answer questions', 200, null, { showLicense: true, message: `congratulation! you passed this level and now you can start the ${lessonLevels.number + 1}` }));
                     }
                     else {
                         yield connection.resetCache();
-                        return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: `congratulation! you passed this level and you can start the next level` }));
+                        return next(new responseService_1.response(req, res, 'answer questions', 200, null, { showLicense: true, message: `congratulation! you passed this level and you can start the next level` }));
                     }
                 }
             }
             else { // if the user didnt pass all 10 question
                 yield connection.resetCache();
-                return next(new responseService_1.response(req, res, 'answer questions', 200, null, { message: `sorry! you cant pass this level! ${answers.length - trueAnswers} question with wrong answers please review the lesson and try again` }));
+                return next(new responseService_1.response(req, res, 'answer questions', 200, null, { showLicense: true, message: `sorry! you cant pass this level! ${answers.length - trueAnswers} question with wrong answers please review the lesson and try again` }));
             }
         });
     }
