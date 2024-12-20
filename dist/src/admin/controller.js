@@ -162,6 +162,7 @@ class adminController {
             req.body.trueOption--;
             let finalData = Object.assign(Object.assign({}, question.toObject()), req.body);
             yield question.updateOne(finalData);
+            yield connection.resetCache();
             return next(new responseService_1.response(req, res, 'update question', 200, null, finalData));
         });
     }
@@ -176,6 +177,7 @@ class adminController {
                 yield questionLevel.updateOne({ $pull: { questions: question._id } });
             }
             yield question.deleteOne();
+            yield connection.resetCache();
             return next(new responseService_1.response(req, res, 'delete question', 200, null, question));
         });
     }

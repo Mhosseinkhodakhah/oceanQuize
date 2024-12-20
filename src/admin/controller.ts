@@ -163,6 +163,7 @@ export default class adminController {
         req.body.trueOption--;
         let finalData = { ...question.toObject(), ...req.body }
         await question.updateOne(finalData)
+        await connection.resetCache()
         return next(new response(req, res, 'update question', 200, null, finalData))
     }
 
@@ -177,6 +178,7 @@ export default class adminController {
             await questionLevel.updateOne({ $pull: { questions: question._id } })
         }
         await question.deleteOne()
+        await connection.resetCache()
         return next(new response(req, res, 'delete question', 200, null, question))
     }
 
