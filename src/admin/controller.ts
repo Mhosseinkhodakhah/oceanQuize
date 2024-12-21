@@ -112,6 +112,15 @@ export default class adminController {
 
 
 
+    async updateLevel(req: any, res: any, next: any){
+        let level = await levelModel.findById(req.params.levelId)
+        if (!level){
+            return next(new response(req , res , 'update level' , 404 ,'this level is not eixist on databse' , null))
+        }
+        await level.updateOne({reward : req.body.reward})
+        return next(new response(req , res , 'update level' , 200 ,null , level))
+    }
+
 
     async deleteLevel(req: any, res: any, next: any) {
         const level = await levelModel.findById(req.params.levelId)

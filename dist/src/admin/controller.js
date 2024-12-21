@@ -113,6 +113,16 @@ class adminController {
             return next(new responseService_1.response(req, res, 'create new level', 200, null, 'new level creation successfully'));
         });
     }
+    updateLevel(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let level = yield level_1.default.findById(req.params.levelId);
+            if (!level) {
+                return next(new responseService_1.response(req, res, 'update level', 404, 'this level is not eixist on databse', null));
+            }
+            yield level.updateOne({ reward: req.body.reward });
+            return next(new responseService_1.response(req, res, 'update level', 200, null, level));
+        });
+    }
     deleteLevel(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const level = yield level_1.default.findById(req.params.levelId);

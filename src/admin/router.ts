@@ -10,6 +10,8 @@ const controller = new adminController()
 
 adminRouter.post('/create-level/:lessonId' , adminAuth , controller.creteNewLevel)
 
+adminRouter.patch('/level/update/:levelId' , adminAuth , controller.updateLevel)
+
 adminRouter.delete('/delete-level/:levelId' , adminAuth , controller.deleteLevel)
 
 adminRouter.post('/create-questions/:levelId' , adminAuth ,controller.createQuestion)

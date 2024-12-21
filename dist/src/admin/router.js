@@ -10,6 +10,7 @@ const adminRouter = (0, express_1.Router)();
 const adminAuth = new middleware_1.default().adminAuth;
 const controller = new controller_1.default();
 adminRouter.post('/create-level/:lessonId', adminAuth, controller.creteNewLevel);
+adminRouter.patch('/level/update/:levelId', adminAuth, controller.updateLevel);
 adminRouter.delete('/delete-level/:levelId', adminAuth, controller.deleteLevel);
 adminRouter.post('/create-questions/:levelId', adminAuth, controller.createQuestion);
 adminRouter.patch('/question/update/:questionId', adminAuth, controller.updateQuestion);
