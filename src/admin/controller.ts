@@ -118,6 +118,7 @@ export default class adminController {
             return next(new response(req , res , 'update level' , 404 ,'this level is not eixist on databse' , null))
         }
         await level.updateOne({reward : req.body.reward})
+        await connection.resetCache()
         return next(new response(req , res , 'update level' , 200 ,null , level))
     }
 
