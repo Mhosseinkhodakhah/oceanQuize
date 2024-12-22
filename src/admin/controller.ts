@@ -129,7 +129,7 @@ export default class adminController {
             return next(new response(req, res, 'delete level', 404, 'this level is not defined on database', null))
         }
         const lesson = await lessonModel.findOne({ levels: { $in: level._id } })
-        const uppersLevels = await leveloMdel.find({ number: { $gt: level.number } })
+        const uppersLevels = await levelModel.find({ number: { $gt: level.number } })
         await questionModel.deleteMany({level : level._id})
         await level.deleteOne()
         levelModel.updateMany({ number: { $gt: level.number }} , {$inc : {number : -1}})
