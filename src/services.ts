@@ -102,5 +102,17 @@ export default class contentService {
 
 
 
+    async showLicens(userId : string){
+        let allLessons = await lessonModel.find()
+        let allFinishedLessonByUser = await lessonModel.find({$in : {seen : userId}})
+        if (allLessons.length === allFinishedLessonByUser.length){
+            return true
+        }else{
+            return false
+        }
+    }
+
+
+
     //////////!last line
 }
