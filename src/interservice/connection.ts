@@ -27,6 +27,8 @@ export default class interConnection {
             },
         })
 
+        const response = await rawResponse.json()
+        
         const rawResponse2 = await fetch(`http://localhost:5003/app/interservice/reset-cache`, {
             method: 'PUT',
             headers: {
@@ -34,8 +36,17 @@ export default class interConnection {
                 "Content-Type": "application/json",
             },
         }) 
+
+        
+        const rawResponse3 = await fetch(`http://localhost:5005/app/interservice/reset-cache`, {
+            method: 'PUT',
+            headers: {
+                Accept: "*/*",
+                "Content-Type": "application/json",
+            },
+        }) 
+
         const response2 = await rawResponse2.json()
-        const response = await rawResponse.json()
         return response;
     }
 
