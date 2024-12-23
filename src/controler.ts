@@ -12,6 +12,7 @@ import { level } from "winston";
 import interConnection from "./interservice/connection";
 import internalCache from "./service/cach";
 import cacher from "./service/cach";
+import messages from "./service/responseMessages";
 
 
 const services = new contentService()
@@ -23,136 +24,12 @@ const connection = new interConnection()
 export default class contentController {
 
 
-    async getLessons(req: any, res: any, next: any) {
-        const language = req.params.lang;
-        let lessons;
-        let allLessons = await cacher.getter('getLessons')
-        if (!allLessons) {                                       // when cache was not exist . . .
-            console.log('cache was empty . . .')
-            const data = await services.makeReadyData()
-            await cacher.setter('getLessons', data)
-            switch (language) {
-                case 'english':
-                    lessons = data.english
-                    break;
-                case 'arabic':
-                    lessons = data.arabic
-                    break;
-                case 'persian':
-                    lessons = data.persian
-                    break;
-
-                default:
-                    return next(new response(req, res, 'get lessons', 400, 'please select a language on params', null))
-                    break;
-            }
-        } else {
-            console.log('read throw cache . . .')                                      // when cache exist 
-            switch (language) {
-                case 'english':
-                    lessons = allLessons.english
-                    break;
-                case 'arabic':
-                    lessons = allLessons.arabic
-                    break;
-                case 'persian':
-                    lessons = allLessons.persian
-                    break;
-
-                default:
-                    return next(new response(req, res, 'get lessons', 400, 'please select a language on params', null))
-                    break;
-            }
-        }
-        return next(new response(req, res, 'get lessons', 200, null, lessons))
-    }
-
-
-
-    async getSubLesson(req: any, res: any, next: any) {
-        const language = req.params.lang;
-        let sublessonContent;
-        sublessonContent = await contentModel.findById(req.params.contentId)
-        if (!sublessonContent) {
-            return next(new response(req, res, 'get specific subLesson', 400, 'this content is not exist', null))
-        }
-
-        return next(new response(req, res, 'get specific subLesson', 200, null, sublessonContent))
-    }
-
-
-
-
-    async getContent(req: any, res: any, next: any) {
-        const content = await contentModel.findById(req.params.contentId).populate('subLesson')
-        return next(new response(req, res, 'get specific content', 200, null, content))
-    }
-
-
-
-    async seenContent(req: any, res: any, next: any) {
-        const content = await contentModel.findByIdAndUpdate(req.params.contentId, { $addToSet: { seen: req.user.id } })
-        await services.checkSeen(content?.subLesson, req.user.id)
-        return next(new response(req, res, 'seen content', 200, null, 'content seen by user!'))
-    }
-
-
-
-
-    async getLevels(req: any, res: any, next: any) {
-        console.log('its hereee')
-        let userId = req.user.id;
-        let levels;
-        let userLevels = await cacher.getter('getLevels')                 // get all levels data from cache
-        if (userLevels) {                       // cache is exist
-            if (!userLevels[userId]) {           // but this userslevel is not exist
-                console.log('cache is not exist . . .')
-                const data = await services.readyLevelsData(userId)     // make the levels ready for this user
-                userLevels[userId] = data                                      // add new userLevels to cache data
-                await cacher.setter('getLevels', userLevels)                    // cache heat the new data
-                levels = data
-            } else {                                // this userLevels are exist on cache
-                console.log('cache is ready . . .')
-                levels = userLevels[userId]
-            }
-        } else {                                    // if cache was totaly empty
-            console.log('cache is empty . .. .')
-            const data = await services.readyLevelsData(userId)         // make this userlevels dat a for cache
-            userLevels = {}                                         // make structure of cache data
-            userLevels[userId] = data                           // add this userLevels to cachData
-            await cacher.setter('getLevels', userLevels)
-            levels = data
-        }
-
-        return next(new response(req, res, 'get levels', 200, null, levels))
-    }
-
-
-
-
-    async openLevel(req: any, res: any, next: any) {
-        let userId = req.user.id;
-        const level = await levelModel.findOne({ number: req.params.number })
-        if (level?.passedUsers.includes(userId)) {
-            const questiotns = await questionModel.find({ level: level?._id }).limit(10)
-            return next(new response(req, res, 'open level', 200, null, { questions: questiotns }))
-        }
-        const questiotns = await questionModel.find({ $and: [{ level: level?._id }, { passedUser: { $ne: userId } }] }).limit(10)
-        return next(new response(req, res, 'open level', 200, null, { questions: questiotns }))
-    }
-
-
-
-
-
-
-
-
     //! needs to review
     async answer(req: any, res: any, next: any) {
         let showLicense = await services.showLicens(req.user.id)
         const answers = req.body.answer                              // get the body
         console.log('body . . .', answers)
+        let lang : string = req.query.lang;
         let trueAnswers: number = 0;                            // define the true answer variable;
         const firstlyQuestion = await questionModel.findById(answers[0].questionId)   // find the first question by question form
         for (let i = 0; i < answers.length; i++) {                                              // loop on the all answers
@@ -191,15 +68,18 @@ export default class contentController {
                 if (isAllLevels == lessonLevels.levels.length) {
                     await lessonModel.findByIdAndUpdate(level?.lesson, { $push: { paasedQuize: req.user.id } })    // update that lesson and put user to passed quize
                     await connection.resetCache()          // reset the fucking cache
-                    return next(new response(req, res, 'answer questions', 200, null, { showLicense : showLicense ,  message: `congratulation! you passed this level and now you can start the ${lessonLevels.number + 1}` }))
+                    let message = (lang && lang!='') ? messages[lang].passedLevelMessage : messages['english'].passedLevelMessage
+                    return next(new response(req, res, 'answer questions', 200, null, { showLicense : showLicense ,  message: `${message} ${lessonLevels.number + 1}` }))
                 } else {
                     await connection.resetCache()
-                    return next(new response(req, res, 'answer questions', 200, null, { showLicense : showLicense , message: `congratulation! you passed this level and you can start the next level` }))
+                    let message = (lang && lang!='') ? messages[lang].passedAllLessonsOfThisLevel : messages['english'].passedAllLessonsOfThisLevel
+                    return next(new response(req, res, 'answer questions', 200, null, { showLicense : showLicense , message: message }))
                 }
             }
         } else {                                                                // if the user didnt pass all 10 question
             await connection.resetCache()
-            return next(new response(req, res, 'answer questions', 200, null, {showLicense : showLicense ,  message: `sorry! you cant pass this level! ${answers.length - trueAnswers} question with wrong answers please review the lesson and try again` }))
+            let message = (lang && lang!='') ? messages[lang].levelNotPassed : messages['english'].levelNotPassed
+            return next(new response(req, res, 'answer questions', 200, null, {showLicense : showLicense ,  message: message }))
         }
     }
 

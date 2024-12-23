@@ -185,7 +185,7 @@ export default class adminController {
 
 
     async getAll(req: any, res: any, next: any) {
-        let question = await questionModel.find()
+        let question = await levelModel.find()
         // if (!question) {
         //     return next(new response(req, res, 'delete question', 404, 'this question is not exist on databse', null))
         // }
