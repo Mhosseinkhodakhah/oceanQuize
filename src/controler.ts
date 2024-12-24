@@ -4,7 +4,7 @@ import { lessonRole } from "./validators";
 import { response } from "./service/responseService";
 import lessonModel from "./DB/models/lesson";
 import subLessonModel from "./DB/models/subLesson";
-import { lessonDB } from "./interfaces";
+import { lessonDB, log } from "./interfaces";
 import contentModel from "./DB/models/content";
 import levelModel from "./DB/models/level";
 import questionModel from "./DB/models/questions";
@@ -28,19 +28,17 @@ export default class contentController {
     async answer(req: any, res: any, next: any) {
         let showLicense = await services.showLicens(req.user.id)
         const answers = req.body.answer                              // get the body
-        console.log('body . . .', answers)
         let lang : string = req.query.lang;
         let trueAnswers: number = 0;                            // define the true answer variable;
         const firstlyQuestion = await questionModel.findById(answers[0].questionId)   // find the first question by question form
         for (let i = 0; i < answers.length; i++) {                                              // loop on the all answers
             console.log(`${i} answer . . .`)
-            let qId = answers[i].questionId;                                            // get title from the answer
-            const question = await questionModel.findById(qId)   // find the first question by question form
+            let questionId = answers[i].questionId;                                            // get title from the answer
+            const question = await questionModel.findById(questionId)   // find the first question by question form
             if (question?.trueOption == answers[i].answerIndex) {                //  it means the user select the true answer  
                 console.log(`${i} answer true . . .`)
                 trueAnswers++;                                                      // increase the trueAnswer ++
                 await question?.updateOne({ $addToSet: { passedUser: req.user.id } })    // update the specific question 
-                await question?.save()
             }
         }
         if (trueAnswers == answers.length) {            // if the user answer all questions truely
@@ -54,7 +52,6 @@ export default class contentController {
                 await level?.updateOne({ $addToSet: { rewarded : req.user.id } })              // then update level for rewarded
                 console.log('update level ')
             }
-            await level?.save()
             const lessonLevels = await lessonModel.findById(level?.lesson).populate('levels').select('levels')           // get all levels on lesson for checking the user finishing all levells
             if (lessonLevels) {
                 let isAllLevels: number = 0;
@@ -65,8 +62,19 @@ export default class contentController {
                     }
                 }
                 console.log('user is in the levele passed user')
+                let userLog:log = {
+                    user : {
+                        userName : req.user.userName,
+                        fullName : req.user.fullName,
+                        profile : req.user.profile,
+                    },
+                    title : `take an exam`,
+                    description : `user ${req.user.fullName} passed level ${level?.number}`
+                }
+                await connection.putNewLog(userLog)
                 if (isAllLevels == lessonLevels.levels.length) {
                     await lessonModel.findByIdAndUpdate(level?.lesson, { $push: { paasedQuize: req.user.id } })    // update that lesson and put user to passed quize
+                    
                     await connection.resetCache()          // reset the fucking cache
                     let message = (lang && lang!='') ? messages[lang].passedLevelMessage : messages['english'].passedLevelMessage
                     return next(new response(req, res, 'answer questions', 200, null, { showLicense : showLicense ,  message: `${message} ${lessonLevels.number + 1}` }))
@@ -76,7 +84,17 @@ export default class contentController {
                     return next(new response(req, res, 'answer questions', 200, null, { showLicense : showLicense , message: message }))
                 }
             }
-        } else {                                                                // if the user didnt pass all 10 question
+        } else {                                                 // if the user didnt pass all 10 question
+            let userLog:log = {
+                user : {
+                    userName : req.user.userName,
+                    fullName : req.user.fullName,
+                    profile : req.user.profile,
+                },
+                title : `take an exam`,
+                description : `user ${req.user.fullName} try to passed level ${level?.number} but can't answer to all question successfully`
+            }
+            await connection.putNewLog(userLog)
             await connection.resetCache()
             let message = (lang && lang!='') ? messages[lang].levelNotPassed : messages['english'].levelNotPassed
             return next(new response(req, res, 'answer questions', 200, null, {showLicense : showLicense ,  message: message }))

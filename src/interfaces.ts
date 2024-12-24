@@ -72,3 +72,18 @@ export interface content {
 export interface responseInterface {
 
 }
+
+
+
+export interface log{
+    user : {
+        userName : string,
+        fullName : string,
+        profile : string,
+    },
+    
+    title : string,
+
+    description : string
+
+}
