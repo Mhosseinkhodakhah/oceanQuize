@@ -85,6 +85,7 @@ export default class contentController {
                 }
             }
         } else {                                                 // if the user didnt pass all 10 question
+            let level = await levelModel.findById(firstlyQuestion?.level)     // update the level and put user to that level
             let userLog:log = {
                 user : {
                     userName : req.user.userName,
