@@ -67,12 +67,12 @@ export default class contentController {
                     await lessonModel.findByIdAndUpdate(level?.lesson, { $push: { paasedQuize: req.user.id } })    // update that lesson and put user to passed quize
 
                     await connection.resetCache()          // reset the fucking cache
-                    let message = (lang && lang != '') ? messages[lang].passedLevelMessage : messages['english'].passedLevelMessage
-                    return next(new response(req, res, 'answer questions', 200, null, { showLicense: showLicense, message: `${message} ${lessonLevels.number + 1}` }))
+                    let message = (lang && lang != '') ? messages[lang].passedAllLessonsOfThisLevel : messages['english'].passedAllLessonsOfThisLevel
+                    return next(new response(req, res, 'answer questions', 200, null, {navigate : true , showLicense: showLicense, message: `${message} ${lessonLevels.number + 1}` }))
                 } else {
                     await connection.resetCache()
-                    let message = (lang && lang != '') ? messages[lang].passedAllLessonsOfThisLevel : messages['english'].passedAllLessonsOfThisLevel
-                    return next(new response(req, res, 'answer questions', 200, null, { showLicense: showLicense, message: message }))
+                    let message = (lang && lang != '') ? messages[lang].passedLevelMessage : messages['english'].passedLevelMessage
+                    return next(new response(req, res, 'answer questions', 200, null, {navigate : true, showLicense: showLicense, message: message }))
                 }
             }
         } else {                                                 // if the user didnt pass all 10 question
@@ -80,7 +80,7 @@ export default class contentController {
             await services.makeLog(req.user, `take an exam`, `user ${req.user.fullName} try to passed level ${level?.number} but can't answer to all question successfully`)
             await connection.resetCache()
             let message = (lang && lang != '') ? messages[lang].levelNotPassed : messages['english'].levelNotPassed
-            return next(new response(req, res, 'answer questions', 200, null, { showLicense: showLicense, message: message }))
+            return next(new response(req, res, 'answer questions', 200, null, {navigate : true, showLicense: showLicense, message: message }))
         }
     }
 
