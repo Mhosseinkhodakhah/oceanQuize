@@ -80,7 +80,7 @@ export default class contentController {
             await services.makeLog(req.user, `take an exam`, `user ${req.user.fullName} try to passed level ${level?.number} but can't answer to all question successfully`)
             await connection.resetCache()
             let message = (lang && lang != '') ? messages[lang].levelNotPassed : messages['english'].levelNotPassed
-            return next(new response(req, res, 'answer questions', 200, null, {navigate : true, showLicense: showLicense, message: message }))
+            return next(new response(req, res, 'answer questions', 200, null, {navigate : false, showLicense: showLicense, message: message }))
         }
     }
 
