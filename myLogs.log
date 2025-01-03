@@ -443,3 +443,78 @@
   label: 'right meow!',
   timestamp: '2024-12-23 21:23:16'
 }
+{
+  meta: {
+    req: {
+      url: '/getAll',
+      headers: {
+        'user-agent': 'PostmanRuntime/7.43.0',
+        accept: '*/*',
+        'postman-token': '7129d040-212a-4d4a-8196-dbf51146617e',
+        host: 'localhost:5002',
+        'accept-encoding': 'gzip, deflate, br',
+        connection: 'keep-alive'
+      },
+      method: 'GET',
+      httpVersion: '1.1',
+      originalUrl: '/getAll',
+      query: {}
+    },
+    res: { statusCode: 200 },
+    responseTime: 831
+  },
+  level: 'info',
+  message: 'GET /getAll 200 831ms',
+  label: 'right meow!',
+  timestamp: '2025-01-03 16:23:26'
+}
+{
+  meta: {
+    req: {
+      url: '/getAll',
+      headers: {
+        'user-agent': 'PostmanRuntime/7.43.0',
+        accept: '*/*',
+        'postman-token': 'ae061d28-e1d2-4d6c-86d6-b4b3539dfac4',
+        host: 'localhost:5002',
+        'accept-encoding': 'gzip, deflate, br',
+        connection: 'keep-alive'
+      },
+      method: 'GET',
+      httpVersion: '1.1',
+      originalUrl: '/getAll',
+      query: {}
+    },
+    res: { statusCode: 200 },
+    responseTime: 1267
+  },
+  level: 'info',
+  message: 'GET /getAll 200 1267ms',
+  label: 'right meow!',
+  timestamp: '2025-01-03 16:27:09'
+}
+{
+  meta: {
+    req: {
+      url: '/getAll',
+      headers: {
+        'user-agent': 'PostmanRuntime/7.43.0',
+        accept: '*/*',
+        'postman-token': '2b4d73db-d144-4ba2-a960-5b2d924f2a1c',
+        host: 'localhost:5002',
+        'accept-encoding': 'gzip, deflate, br',
+        connection: 'keep-alive'
+      },
+      method: 'GET',
+      httpVersion: '1.1',
+      originalUrl: '/getAll',
+      query: {}
+    },
+    res: { statusCode: 200 },
+    responseTime: 492
+  },
+  level: 'info',
+  message: 'GET /getAll 200 492ms',
+  label: 'right meow!',
+  timestamp: '2025-01-03 16:28:06'
+}

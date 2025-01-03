@@ -158,6 +158,7 @@ export default class adminController {
 
     async updateQuestion(req: any, res: any, next: any) {
         let question = await questionModel.findById(req.params.questionId)
+        console.log('body>>>>>>>>>>' , req.body)
         if (!question) {
             return next(new response(req, res, 'update question', 404, 'this question is not exist on databse', null))
         }
@@ -185,10 +186,7 @@ export default class adminController {
 
 
     async getAll(req: any, res: any, next: any) {
-        let question = await levelModel.find()
-        // if (!question) {
-        //     return next(new response(req, res, 'delete question', 404, 'this question is not exist on databse', null))
-        // }
+        let question = await levelModel.find({number :3}).populate('questions')
         
         return next(new response(req, res, 'delete question', 200, null, question))
     }
