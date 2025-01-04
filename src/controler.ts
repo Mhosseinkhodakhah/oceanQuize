@@ -26,7 +26,7 @@ export default class contentController {
 
     //! needs to review
     async answer(req: any, res: any, next: any) {
-        let showLicense = await services.showLicens(req.user.id)
+        let showLicense = false
         const answers = req.body.answer                              // get the body
         let lang: string = req.query.lang;
         let trueAnswers: number = 0;                            // define the true answer variable;
@@ -68,10 +68,12 @@ export default class contentController {
 
                     await connection.resetCache()          // reset the fucking cache
                     let message = (lang && lang != '') ? messages[lang].passedAllLessonsOfThisLevel : messages['english'].passedAllLessonsOfThisLevel
-                    return next(new response(req, res, 'answer questions', 200, null, {navigate : true , showLicense: showLicense, message: `${message} ${lessonLevels.number + 1}` }))
+                    showLicense = await services.showLicens(req.user.id)
+                    return next(new response(req, res, 'answer questions', 200, null, {navigate : true , showLicense: showLicense, message: message }))
                 } else {
                     await connection.resetCache()
                     let message = (lang && lang != '') ? messages[lang].passedLevelMessage : messages['english'].passedLevelMessage
+                    showLicense = await services.showLicens(req.user.id)
                     return next(new response(req, res, 'answer questions', 200, null, {navigate : true, showLicense: showLicense, message: message }))
                 }
             }
